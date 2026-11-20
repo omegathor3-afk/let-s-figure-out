@@ -3,6 +3,7 @@ package com.omega.autoearn
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -14,6 +15,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowOutward
+import androidx.compose.material.icons.rounded.BatteryChargingFull
 import androidx.compose.material.icons.rounded.Hive
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Security
@@ -48,10 +50,24 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun AutoEarnScreen() {
     val context = LocalContext.current
-    var disclosure by remember { mutableStateOf(false) }
     var opened by remember { mutableStateOf(false) }
     val honeygainInstalled = remember {
         context.packageManager.getLaunchIntentForPackage(HONEYGAIN_PACKAGE) != null
+    }
+    fun openHoneygain() {
+        val launch = context.packageManager.getLaunchIntentForPackage(HONEYGAIN_PACKAGE)
+        if (launch != null) {
+            context.startActivity(launch)
+            opened = true
+        } else {
+            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://www.honeygain.com/download/")))
+        }
+    }
+    fun openHoneygainSettings() {
+        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+            data = Uri.parse("package:$HONEYGAIN_PACKAGE")
+        }
+        context.startActivity(intent)
     }
     MaterialTheme(colorScheme = darkColorScheme(
         primary = Honey, onPrimary = Night, background = Night,
@@ -68,16 +84,16 @@ fun AutoEarnScreen() {
                     }
                     Column {
                         Text("AUTOEARN", color = Honey, fontSize = 13.sp, fontWeight = FontWeight.Black, letterSpacing = 2.8.sp)
-                        Text("مساعد الدخل الذكي", color = Cream, fontSize = 12.sp)
+                        Text("مساعد تشغيل مصادر الدخل", color = Cream, fontSize = 12.sp)
                     }
                     Spacer(Modifier.weight(1f))
                     Box(Modifier.border(1.dp, Honey.copy(alpha = .35f), CircleShape).padding(horizontal = 11.dp, vertical = 6.dp)) {
-                        Text("BETA  •  0.3", color = HoneySoft, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                        Text("BETA  •  0.4", color = HoneySoft, fontSize = 10.sp, fontWeight = FontWeight.Bold)
                     }
                 }
                 Column(verticalArrangement = Arrangement.spacedBy(7.dp)) {
-                    Text("خلّي اتصالك\nيشتغل بذكاء.", color = Cream, fontSize = 31.sp, lineHeight = 37.sp, fontWeight = FontWeight.ExtraBold)
-                    Text("تابع مصادر الدخل المسموح بها من مكان واحد، بوضوح وتحكّم.", color = Ash, fontSize = 14.sp, lineHeight = 21.sp)
+                    Text("شغّل مصدر دخلك\nبأقل خطوات.", color = Cream, fontSize = 30.sp, lineHeight = 37.sp, fontWeight = FontWeight.ExtraBold)
+                    Text("AUTOEARN يوصلك بالخدمة المثبتة ويساعدك تجهّز الهاتف لاستمرارها.", color = Ash, fontSize = 14.sp, lineHeight = 21.sp)
                 }
                 Card(
                     colors = CardDefaults.cardColors(containerColor = SurfaceRaised),
@@ -91,82 +107,70 @@ fun AutoEarnScreen() {
                             }
                             Spacer(Modifier.width(11.dp))
                             Column(Modifier.weight(1f)) {
-                                Text("مصدر دخل محتمل", color = Ash, fontSize = 11.sp)
+                                Text("خدمة مشاركة الإنترنت", color = Ash, fontSize = 11.sp)
                                 Text("Honeygain", color = Cream, fontSize = 21.sp, fontWeight = FontWeight.Bold)
                             }
                             Box(Modifier.background(Olive.copy(alpha = .16f), CircleShape).padding(horizontal = 10.dp, vertical = 6.dp)) {
-                                Text("اختياري", color = Olive, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                                Text(if (honeygainInstalled) "مثبّت" else "غير مثبّت", color = Olive, fontSize = 10.sp, fontWeight = FontWeight.Bold)
                             }
                         }
-                        Text("مشاركة جزء من اتصال الإنترنت غير المستخدم مقابل رصيد. العائد يتغير حسب الطلب على عنوان IP وحجم الاستخدام، ولا يوجد دخل مضمون.", color = Ash, fontSize = 13.sp, lineHeight = 20.sp)
+                        Text("Honeygain هو الذي يشارك الإنترنت ويحسب الرصيد. بعد تسجيل الدخول وبدء الخدمة داخله، يعمل في الخلفية حسب إعدادات الهاتف والطلب على اتصالك.", color = Ash, fontSize = 13.sp, lineHeight = 20.sp)
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Box(Modifier.size(7.dp).background(if (honeygainInstalled) Olive else Honey, CircleShape))
                             Spacer(Modifier.width(8.dp))
                             Text(
                                 when {
-                                    !honeygainInstalled -> "لم نعثر على Honeygain مثبتًا"
-                                    opened -> "تم فتح تطبيق Honeygain"
-                                    else -> "Honeygain مثبت على هاتفك"
+                                    !honeygainInstalled -> "لم نعثر على التطبيق المثبّت"
+                                    opened -> "تم إرسال أمر فتح Honeygain"
+                                    else -> "Honeygain موجود على هاتفك"
                                 },
                                 color = if (honeygainInstalled) Olive else HoneySoft,
                                 fontSize = 11.sp
                             )
                         }
                         Button(
-                            onClick = { disclosure = true },
+                            onClick = { openHoneygain() },
                             modifier = Modifier.fillMaxWidth().height(52.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = Honey, contentColor = Night),
                             shape = RoundedCornerShape(16.dp)
                         ) {
-                            Text(if (honeygainInstalled) "افتح Honeygain" else "اعثر على Honeygain", fontWeight = FontWeight.ExtraBold, fontSize = 14.sp)
+                            Text(if (honeygainInstalled) "افتح Honeygain الآن" else "تنزيل Honeygain الرسمي", fontWeight = FontWeight.ExtraBold, fontSize = 14.sp)
                             Spacer(Modifier.width(8.dp))
                             Icon(Icons.Rounded.ArrowOutward, contentDescription = null, modifier = Modifier.size(17.dp))
+                        }
+                        OutlinedButton(
+                            onClick = { if (honeygainInstalled) openHoneygainSettings() else openHoneygain() },
+                            modifier = Modifier.fillMaxWidth().height(50.dp),
+                            border = androidx.compose.foundation.BorderStroke(1.dp, Honey.copy(alpha = .45f)),
+                            colors = ButtonDefaults.outlinedButtonColors(contentColor = HoneySoft),
+                            shape = RoundedCornerShape(16.dp)
+                        ) {
+                            Icon(Icons.Rounded.BatteryChargingFull, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Spacer(Modifier.width(8.dp))
+                            Text("إعداد البطارية والتشغيل بالخلفية", fontWeight = FontWeight.Bold, fontSize = 13.sp)
                         }
                     }
                 }
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(9.dp)) {
                     Icon(Icons.Rounded.Security, contentDescription = null, tint = Honey, modifier = Modifier.size(20.dp))
-                    Text("قبل ما تبدأ، اعرف التفاصيل", color = Cream, fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                    Text("خطوات تفعيل التشغيل المستمر", color = Cream, fontSize = 15.sp, fontWeight = FontWeight.Bold)
                 }
                 Card(colors = CardDefaults.cardColors(containerColor = SurfaceDark), shape = RoundedCornerShape(20.dp)) {
                     Column(Modifier.padding(17.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        InfoLine("اتصالك وعنوان IP قد يُستخدمان لتمرير طلبات عملاء الخدمة.")
-                        InfoLine("قد يزيد استهلاك البيانات، وقد تتعارض الخدمة مع شروط مزود الإنترنت.")
-                        InfoLine("السحب ووسائله وحدوده تعتمد على بلدك وحسابك؛ لا يوجد ضمان لتوفر Vodafone Cash.")
-                        InfoLine("لا تشغّل مشاركة الإنترنت إلا على شبكة تملك حق استخدامها وبعد قراءة الشروط.")
+                        InfoLine("سجّل الدخول إلى Honeygain وابدأ المشاركة من داخله أول مرة.")
+                        InfoLine("من إعدادات التطبيق، افتح البطارية واختر عدم التقييد أو السماح بالنشاط في الخلفية إن كان الخيار متاحًا.")
+                        InfoLine("اترك إشعارات Honeygain مفعّلة لتعرف إن توقف أو احتاج تدخلك.")
+                        InfoLine("استخدم شبكة تملكها أو لديك إذن باستخدامها، وراقب استهلاك البيانات.")
                     }
                 }
                 Row(verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.spacedBy(9.dp)) {
                     Icon(Icons.Rounded.Info, contentDescription = null, tint = HoneySoft, modifier = Modifier.size(18.dp))
-                    Text("بشفافية: AUTOEARN يستطيع فتح Honeygain المثبّت، لكنه لا يستطيع قراءة حالة المشاركة أو تسجيل الدخول أو تشغيل الخدمة من تلقاء نفسه؛ هذه الوظائف لا توفر لها Honeygain واجهة تكامل عامة موثقة.", color = Ash, fontSize = 11.sp, lineHeight = 17.sp)
+                    Text("بشفافية: AUTOEARN لا ينشئ أرباحًا بنفسه ولا يستطيع تسجيل الدخول أو تشغيل مشاركة الإنترنت سرًا أو قراءة رصيد Honeygain. زر البطارية يفتح إعدادات التطبيق لتضبطها بنفسك. Honeygain هو الذي ينفّذ مشاركة الاتصال.", color = Ash, fontSize = 11.sp, lineHeight = 17.sp)
                 }
                 Text("صُنع بعناية • AUTOEARN", color = Color(0xFF746B5B), fontSize = 10.sp, modifier = Modifier.align(Alignment.CenterHorizontally))
                 Spacer(Modifier.height(8.dp))
             }
         }
-    }
-    if (disclosure) {
-        AlertDialog(
-            onDismissRequest = { disclosure = false },
-            containerColor = SurfaceRaised,
-            titleContentColor = Cream,
-            textContentColor = Ash,
-            title = { Text("موافقة واعية قبل مشاركة الإنترنت") },
-            text = { Text("قد تمر حركة بيانات عبر عنوان IP الخاص بك لصالح عملاء Honeygain. راجع استهلاك البيانات وشروط مزود الخدمة وسياسة الخصوصية. هل تريد المتابعة إلى تطبيق Honeygain؟") },
-            confirmButton = {
-                TextButton(onClick = {
-                    disclosure = false
-                    val launch = context.packageManager.getLaunchIntentForPackage(HONEYGAIN_PACKAGE)
-                    if (launch != null) {
-                        context.startActivity(launch)
-                        opened = true
-                    } else {
-                        context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://www.honeygain.com/download/")))
-                    }
-                }) { Text("متابعة", color = Honey, fontWeight = FontWeight.Bold) }
-            },
-            dismissButton = { TextButton(onClick = { disclosure = false }) { Text("إلغاء", color = Ash) } }
-        )
     }
 }
 

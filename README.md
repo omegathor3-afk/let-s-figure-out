@@ -1,23 +1,23 @@
-# AutoEarn
+# AUTOEARN
 
-Arabic-first Android companion for managing legitimate passive-income services.
+Arabic-first Android companion for starting and keeping legitimate earning services configured.
 
-## Current MVP
+## Current functionality
 - Native Android / Kotlin / Jetpack Compose app.
-- Arabic onboarding screen for Honeygain.
-- Explicit disclosure of bandwidth sharing, IP routing, payout thresholds, and network risks.
-- No fake earnings, fake steps, ad clicks, survey automation, or bypassing third-party app rules.
+- Honeycomb-inspired dark/gold Arabic UI.
+- Detects whether the Honeygain Android package is installed.
+- Opens the installed Honeygain app directly; falls back to Honeygain's official download page if absent.
+- Opens Android's App info page for Honeygain so the device owner can configure battery/background restrictions.
+- Explains the setup steps and network-sharing risks.
 
-## Important limitations
-AutoEarn is a companion, not a Honeygain client. It does not embed Honeygain, control its account, read its private balance, or guarantee earnings. Honeygain must be installed and configured separately by the device owner. Android does not let an ordinary app silently control another app's private functions.
+## What it does not do
+AUTOEARN is not itself a money-making network and does not generate guaranteed income. Honeygain performs bandwidth sharing inside its own app after the user signs in and starts it. AUTOEARN cannot access Honeygain's private account, force its service to run, read its balance, or withdraw money. No public integration/API is documented for these controls.
 
-Honeygain's current published payout details:
-- Honeygain mode: $20 minimum, PayPal.
-- JumpTask mode: $1 first payout, then $0.50; gift-card options depend on country and are handled through GIFQ.
-- Vodafone Cash is not listed as a direct payout method.
-- Earnings depend on actual demand for the user's IP and bandwidth; there is no guaranteed daily income.
-
-Review the official terms before enabling bandwidth sharing. Honeygain warns that internet-provider terms, mobile data charges, and network usage can affect the user.
+## Egypt-specific research (November 2026)
+- Honeygain is the only option in this MVP aimed at passive bandwidth sharing. Honeygain says its Android app must be installed from its official website (it is not on Google Play). Earnings depend on demand and are not guaranteed.
+- Honeygain payout options vary by mode and country: Honeygain mode has a $20 minimum; JumpTask mode has a $1 first payout then $0.50, with payout handled through GIFQ. Vodafone Cash is not listed as a direct method.
+- Ayyam advertises payouts in Egypt to InstaPay or mobile wallets including Vodafone, but earnings are from genuine views on original videos. Ayyam's rules prohibit fake views, bots, and unapproved automated app use, so AUTOEARN must not automate views or engagement.
+- GIG Egypt lists shift-based work with Vodafone Cash and other payout methods; these are real shifts, not unattended phone earnings.
 
 ## Build
 GitHub Actions builds a debug APK on pushes to main and manual workflow dispatch.
